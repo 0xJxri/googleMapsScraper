@@ -59,10 +59,11 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
             const wrapper = await page.$$('.m6QErb.DxyBCb.kA9KIf.dS8AEf.ecceSd > .m6QErb.DxyBCb.kA9KIf.dS8AEf.ecceSd.QjC7t');
 
             for (const rowHandle of wrapper) {
-                const divs = await rowHandle.$$('.Nv2PK.tH5CWc.THOPZb ');
+                const divs = await rowHandle.$$('.Nv2PK.tH5CWc.THOPZb, .Nv2PK.Q2HXcd.THOPZb');
                 for (const divHandle of divs) {
                     try {
                         const ariaLabel = await divHandle.$eval('a', el => el.getAttribute('aria-label'));
+
                         let classValue;
                         try {
                             classValue = await divHandle.$eval('.UsdlK', el => el.textContent);
@@ -73,8 +74,9 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                         const urlElement = await divHandle.$('.lcr4fd.S9kvJb');
                         if (urlElement) {
                             url = await urlElement.evaluate(a => a.getAttribute('href'));
-                        } else {
-                            url = 'URL not present';
+                        }
+                        else {
+                            url = ''
                         }
 
                         fs.appendFileSync(allValuesFilePath, `"${ariaLabel}","${classValue}","${url}"\n`);
@@ -82,7 +84,7 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                         // Check if classValue starts with '0' or '3' and save to respective files
                         if (classValue.startsWith('3')) {
                             fs.appendFileSync(numeriMobiliFilePath, `"${ariaLabel}","${classValue}","${url}"\n`);
-                        } else{
+                        } else {
                             fs.appendFileSync(numeriFissiFilePath, `"${ariaLabel}","${classValue}","${url}"\n`);
                         }
                     } catch (error) {

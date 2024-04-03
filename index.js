@@ -64,12 +64,21 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                     try {
                         const ariaLabel = await divHandle.$eval('a', el => el.getAttribute('aria-label'));
 
+                        // Get aria-label attribute value of element with id 'searchbox'
+                        const searchboxAriaLabel = await page.$eval('#searchbox', el => el.getAttribute('aria-label'));
+                        const words = searchboxAriaLabel.split(' ');
+                        const lastWord = words.pop(); // Extract the last word from searchbox aria label
+                        const nameCity = lastWord.charAt(0).toUpperCase() + lastWord.slice(1);
+                        console.log("Last Word from Searchbox Aria Label:", nameCity);
+                        
+
                         let classValue;
                         try {
                             classValue = await divHandle.$eval('.UsdlK', el => el.textContent);
                         } catch (error) {
                             classValue = '';
                         }
+
                         let url = '';
                         const urlElement = await divHandle.$('.lcr4fd.S9kvJb');
                         if (urlElement) {
@@ -79,13 +88,13 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                             url = ''
                         }
 
-                        fs.appendFileSync(allValuesFilePath, `"${ariaLabel}","${classValue}","${url}"\n`);
+                        fs.appendFileSync(allValuesFilePath, `"${ariaLabel}","${nameCity}","${classValue}","${url}"\n`);
 
                         // Check if classValue starts with '0' or '3' and save to respective files
                         if (classValue.startsWith('3')) {
-                            fs.appendFileSync(numeriMobiliFilePath, `"${ariaLabel}","${classValue}","${url}"\n`);
+                            fs.appendFileSync(numeriMobiliFilePath, `"${ariaLabel}","${nameCity}","${classValue}","${url}"\n`);
                         } else {
-                            fs.appendFileSync(numeriFissiFilePath, `"${ariaLabel}","${classValue}","${url}"\n`);
+                            fs.appendFileSync(numeriFissiFilePath, `"${ariaLabel}",${nameCity}","${classValue}","${url}"\n`);
                         }
                     } catch (error) {
                         continue;

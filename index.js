@@ -1,16 +1,31 @@
 import puppeteer from "puppeteer";
 import fs from "fs";
 import readline from 'readline';
+import path from 'path';
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
-const csvFilePath = 'data.csv';
+const dataFolderPath = './data/';
+const allValuesFilePath = path.join(dataFolderPath, 'allValues.csv');
+const numeriFissiFilePath = path.join(dataFolderPath, 'numeriFissi.csv');
+const numeriMobiliFilePath = path.join(dataFolderPath, 'numeriMobili.csv');
 
-if (!fs.existsSync(csvFilePath)) {
-    fs.writeFileSync(csvFilePath, 'nomi,numeri,url\n');
+// Clean up existing CSV files
+cleanUpCSV(allValuesFilePath);
+cleanUpCSV(numeriFissiFilePath);
+cleanUpCSV(numeriMobiliFilePath);
+
+// Function to clean up CSV files
+function cleanUpCSV(filePath) {
+    try {
+        fs.truncateSync(filePath, 0);
+        console.log(`Cleaned up ${filePath}`);
+    } catch (error) {
+        console.error(`Error cleaning up ${filePath}:`, error);
+    }
 }
 
 rl.question('Inserisci la stringa = ', async (stringToSearch) => {
@@ -62,7 +77,14 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                             url = 'URL not present';
                         }
 
-                        fs.appendFileSync(csvFilePath, `"${ariaLabel}","${classValue}","${url}"\n`);
+                        fs.appendFileSync(allValuesFilePath, `"${ariaLabel}","${classValue}","${url}"\n`);
+
+                        // Check if classValue starts with '0' or '3' and save to respective files
+                        if (classValue.startsWith('3')) {
+                            fs.appendFileSync(numeriMobiliFilePath, `"${ariaLabel}","${classValue}","${url}"\n`);
+                        } else{
+                            fs.appendFileSync(numeriFissiFilePath, `"${ariaLabel}","${classValue}","${url}"\n`);
+                        }
                     } catch (error) {
                         continue;
                     }

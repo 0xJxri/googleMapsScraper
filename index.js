@@ -59,7 +59,7 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
             const wrapper = await page.$$('.m6QErb.DxyBCb.kA9KIf.dS8AEf.ecceSd > .m6QErb.DxyBCb.kA9KIf.dS8AEf.ecceSd.QjC7t');
 
             for (const rowHandle of wrapper) {
-                const divs = await rowHandle.$$('.Nv2PK.tH5CWc.THOPZb, .Nv2PK.Q2HXcd.THOPZb');
+                const divs = await rowHandle.$$('.Nv2PK.tH5CWc.THOPZb, .Nv2PK.Q2HXcd.THOPZb, .Nv2PK.THOPZb.CpccDe');
                 for (const divHandle of divs) {
                     try {
                         const ariaLabel = await divHandle.$eval('a', el => el.getAttribute('aria-label'));
@@ -69,12 +69,11 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                         const words = searchboxAriaLabel.split(' ');
                         const lastWord = words.pop(); // Extract the last word from searchbox aria label
                         const nameCity = lastWord.charAt(0).toUpperCase() + lastWord.slice(1);
-                        console.log("Last Word from Searchbox Aria Label:", nameCity);
-                        
+
 
                         let classValue;
                         try {
-                            classValue = await divHandle.$eval('.UsdlK', el => el.textContent);
+                            classValue = (await divHandle.$eval('.UsdlK', el => el.textContent)).replace(/\s/g, '');
                         } catch (error) {
                             classValue = '';
                         }
@@ -85,8 +84,25 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                             url = await urlElement.evaluate(a => a.getAttribute('href'));
                         }
                         else {
-                            url = ''
+                            const hfpxzcElement = await divHandle.$('.Nv2PK.THOPZb.CpccDe .hfpxzc');
+                            if (hfpxzcElement) {
+                                const href = await hfpxzcElement.evaluate(a => a.getAttribute('href'));
+                                const newPage = await browser.newPage();
+                                await newPage.goto(href);
+                                const elementExists = await newPage.$('.m6QErb .rogA2c.ITvuef .Io6YTe.fontBodyMedium.kR99db');
+                                if (elementExists) {
+                                    url = await newPage.$eval('.m6QErb .rogA2c.ITvuef .Io6YTe.fontBodyMedium.kR99db', el => el.textContent.trim());
+                                } else {
+                                    url = '';
+                                }
+                                await newPage.close();
+                            }
+                            else {
+                                url = ''
+                            }
                         }
+
+
 
                         fs.appendFileSync(allValuesFilePath, `"${ariaLabel}","${nameCity}","${classValue}","${url}"\n`);
 
@@ -94,7 +110,7 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                         if (classValue.startsWith('3')) {
                             fs.appendFileSync(numeriMobiliFilePath, `"${ariaLabel}","${nameCity}","${classValue}","${url}"\n`);
                         } else {
-                            fs.appendFileSync(numeriFissiFilePath, `"${ariaLabel}",${nameCity}","${classValue}","${url}"\n`);
+                            fs.appendFileSync(numeriFissiFilePath, `"${ariaLabel}","${nameCity}","${classValue}","${url}"\n`);
                         }
                     } catch (error) {
                         continue;

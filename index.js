@@ -64,11 +64,15 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                     try {
                         const ariaLabel = await divHandle.$eval('a', el => el.getAttribute('aria-label'));
 
+
                         // Get aria-label attribute value of element with id 'searchbox'
-                        const searchboxAriaLabel = await page.$eval('#searchbox', el => el.getAttribute('aria-label'));
-                        const words = searchboxAriaLabel.split(' ');
-                        const lastWord = words.pop(); // Extract the last word from searchbox aria label
+                        // Get the text content of the <title> tag
+                        const pageTitle = await page.title();
+                        const words = pageTitle.split(' ');
+                        const lastWord = words[1];
                         const nameCity = lastWord.charAt(0).toUpperCase() + lastWord.slice(1);
+
+                        console.log(nameCity)
 
 
                         let classValue;
@@ -77,6 +81,7 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                         } catch (error) {
                             classValue = '';
                         }
+
 
                         let url = '';
                         const urlElement = await divHandle.$('.lcr4fd.S9kvJb');
@@ -101,6 +106,7 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
                                 url = ''
                             }
                         }
+
 
 
 

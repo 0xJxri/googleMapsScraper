@@ -67,12 +67,19 @@ rl.question('Inserisci la stringa = ', async (stringToSearch) => {
 
                         // Get aria-label attribute value of element with id 'searchbox'
                         // Get the text content of the <title> tag
+                        // Get the page title
                         const pageTitle = await page.title();
-                        const words = pageTitle.split(' ');
-                        const lastWord = words[1];
+
+                        const mainTitle = pageTitle.split(' - ')[0];
+
+                        const words = mainTitle.split(' ');
+
+                        const lastWord = words.pop();
                         const nameCity = lastWord.charAt(0).toUpperCase() + lastWord.slice(1);
 
-                        console.log(nameCity)
+                        console.log(pageTitle);
+                        console.log(nameCity);
+
 
 
                         let classValue;
